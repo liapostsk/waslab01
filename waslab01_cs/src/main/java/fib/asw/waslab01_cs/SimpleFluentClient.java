@@ -12,7 +12,9 @@ public class SimpleFluentClient {
   	
   	/* Insert code for Task #4 here */
   	
-  	System.out.println(Request.get(URI).execute().returnContent());
+	
+		
+  	System.out.println(Request.get(URI).addHeader("Accept", "text/plain").execute().returnContent());
   	
   	/* Insert code for Task #5 here */
   }

@@ -21,14 +21,30 @@ public class WoTServlet extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        List<Tweet> tweets = tweetDAO.getAllTweets();
-
-        printHTMLresults(response, tweets);
-
+        
+    	List<Tweet> tweets = tweetDAO.getAllTweets();
+    	
+        if (request.getHeader("Accept").equals("text/plain")) printPLAINresult(response, tweets);
+        else {
+            printHTMLresults(response, tweets);
+        }
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void printPLAINresult(HttpServletResponse response, List<Tweet> tweets) throws IOException {
+    	String currentDate = "None";
+    	DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.FULL, currentLocale);
+        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT, currentLocale);
+        response.setContentType ("text/plain");
+        response.setCharacterEncoding(ENCODING);
+        PrintWriter out = response.getWriter();
+        
+        for (Tweet tweet: tweets) {
+
+            out.println(tweet.getCreated_at() + " (tweet.id = " + tweet.getTwid() + "): " + tweet.getAuthor() + " wrote \"" + tweet.getText() + "\"");
+        }
+	}
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // This method does NOTHING but redirect to the main page
 
