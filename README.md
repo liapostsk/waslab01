@@ -2,6 +2,6 @@
 
 Students: 
 
-* Surname_1, First_name_1
+Lopez, Noelia
 
-* Surname_2, First_name_2
+Andujar, Enrique
