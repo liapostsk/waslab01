@@ -32,10 +32,7 @@ public class WoTServlet extends HttpServlet {
     }
 
     private void printPLAINresult(HttpServletResponse response, List<Tweet> tweets) throws IOException {
-    	String currentDate = "None";
-    	DateFormat dateFormatter = DateFormat.getDateInstance(DateFormat.FULL, currentLocale);
-        DateFormat timeFormatter = DateFormat.getTimeInstance(DateFormat.DEFAULT, currentLocale);
-        response.setContentType ("text/plain");
+    	response.setContentType ("text/plain");
         response.setCharacterEncoding(ENCODING);
         PrintWriter out = response.getWriter();
         
@@ -49,19 +46,28 @@ public class WoTServlet extends HttpServlet {
 		
 		String author = new String();
 		String tweetText = new String();
+		long id = 0;
 		
 		author = request.getParameter("author");
 		tweetText = request.getParameter("tweet_text");
 		
 		try {
-			tweetDAO.insertTweet(author, tweetText);
+			id = tweetDAO.insertTweet(author, tweetText);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		
-        // This method does NOTHING but redirect to the main page
-
-        response.sendRedirect(request.getContextPath());
+		response.setContentType ("text/plain");
+        response.setCharacterEncoding(ENCODING);
+        PrintWriter out = response.getWriter();
+		
+		
+		if (request.getHeader("Accept").equals("text/plain")) out.println(id);
+        else {
+        	// This method does NOTHING but redirect to the main page
+        	response.sendRedirect(request.getContextPath());
+        }
+        
     }
 
     private void printHTMLresults (HttpServletResponse response, List<Tweet> tweets) throws IOException {
