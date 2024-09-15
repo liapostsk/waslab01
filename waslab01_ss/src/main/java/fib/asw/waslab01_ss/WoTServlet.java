@@ -53,16 +53,18 @@ public class WoTServlet extends HttpServlet {
 		long id = 0;
 		
 		if (wid != null) {
-			author = "nofurula";
-			tweetText = "tweet_text";
-			
-			try {
-				id = tweetDAO.deleteTweet(wid);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			Cookie[] vectorCookies = request.getCookies();
+			if(vectorCookies != null) 
+			{
+				for(Cookie cookies:vectorCookies)
+				{
+					if(cookies.getValue().equals(sha256(String.valueOf(wid)))) 
+					{
+						tweetDAO.deleteTweet(Integer.valueOf(wid));
+					}
+				}
 		
-			
+			}
 		}
 		else {
 			author = request.getParameter("author");
@@ -70,6 +72,8 @@ public class WoTServlet extends HttpServlet {
 			
 			try {
 				id = tweetDAO.insertTweet(author, tweetText);
+				  Cookie c = new Cookie("idTweetClient", sha256(String.valueOf(id)));
+			      response.addCookie(c);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -79,7 +83,7 @@ public class WoTServlet extends HttpServlet {
         response.setCharacterEncoding(ENCODING);
         PrintWriter out = response.getWriter();
         
-        //Cookie c = new Cookie("idTweet:", sha256(String.valueOf(id)));
+      
 		
 		if (request.getHeader("Accept").equals("text/plain")) out.println(id);
         else {
