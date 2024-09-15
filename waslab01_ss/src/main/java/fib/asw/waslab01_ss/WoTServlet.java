@@ -1,6 +1,7 @@
 package fib.asw.waslab01_ss;
 
 import java.io.*;
+import java.security.MessageDigest;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.List;
@@ -46,21 +47,30 @@ public class WoTServlet extends HttpServlet {
 		
 		String author = new String();
 		String tweetText = new String();
+		
+		String wid = request.getParameter("twid");
+		
 		long id = 0;
 		
-		author = request.getParameter("author");
-		tweetText = request.getParameter("tweet_text");
-		
-		try {
-			id = tweetDAO.insertTweet(author, tweetText);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		if (wid.equals(null)) {
+			
+		}
+		else {
+			author = request.getParameter("author");
+			tweetText = request.getParameter("tweet_text");
+			
+			try {
+				id = tweetDAO.insertTweet(author, tweetText);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		response.setContentType ("text/plain");
         response.setCharacterEncoding(ENCODING);
         PrintWriter out = response.getWriter();
-		
+        
+        Cookie c = new Cookie("idTweet:", sha256(String.valueOf(id)));
 		
 		if (request.getHeader("Accept").equals("text/plain")) out.println(id);
         else {
@@ -102,9 +112,31 @@ public class WoTServlet extends HttpServlet {
             }
             out.println("<div class=\"wallitem\">");
             out.println("<h4><em>" + tweet.getAuthor() + "</em> @ "+ timeFormatter.format(tweet.getCreated_at()) +"</h4>");
-            out.println("<p>" + tweet.getText() + "</p>");
+            out.println("<p>" + tweet.getText() + "&nbsp;&nbsp;&nbsp;<td><input type=\"submit\" name=\"action\" value=\"Esborra\"></td></tr>" + "</p>");
+            out.println("<tr><td><input type=\"hidden\" name=\"twid\" value=" + tweet.getTwid() + "></td></tr>");
             out.println("</div>");
         }
         out.println ( "</body></html>" );
     }
+    
+    public static String sha256(String base) {
+		try {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	        byte[] hash = digest.digest(base.getBytes("UTF-8"));
+	        StringBuffer hexString = new StringBuffer();
+
+	        for (int i = 0; i < hash.length; i++) {
+	            String hex = Integer.toHexString(0xff & hash[i]);
+	            if (hex.length() == 1) {
+	            	hexString.append('0');
+	            }
+	            hexString.append(hex);
+	        }
+
+	        return hexString.toString();
+	    } catch(Exception e) {
+	    	throw new RuntimeException(e);
+	    }
+	}
+    
 }
