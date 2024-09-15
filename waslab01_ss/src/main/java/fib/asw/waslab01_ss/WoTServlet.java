@@ -52,7 +52,16 @@ public class WoTServlet extends HttpServlet {
 		
 		long id = 0;
 		
-		if (wid.equals(null)) {
+		if (wid != null) {
+			author = "nofurula";
+			tweetText = "tweet_text";
+			
+			try {
+				id = tweetDAO.deleteTweet(wid);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		
 			
 		}
 		else {
@@ -70,7 +79,7 @@ public class WoTServlet extends HttpServlet {
         response.setCharacterEncoding(ENCODING);
         PrintWriter out = response.getWriter();
         
-        Cookie c = new Cookie("idTweet:", sha256(String.valueOf(id)));
+        //Cookie c = new Cookie("idTweet:", sha256(String.valueOf(id)));
 		
 		if (request.getHeader("Accept").equals("text/plain")) out.println(id);
         else {
@@ -112,8 +121,10 @@ public class WoTServlet extends HttpServlet {
             }
             out.println("<div class=\"wallitem\">");
             out.println("<h4><em>" + tweet.getAuthor() + "</em> @ "+ timeFormatter.format(tweet.getCreated_at()) +"</h4>");
+            out.println("<form method=\"post\">");
             out.println("<p>" + tweet.getText() + "&nbsp;&nbsp;&nbsp;<td><input type=\"submit\" name=\"action\" value=\"Esborra\"></td></tr>" + "</p>");
             out.println("<tr><td><input type=\"hidden\" name=\"twid\" value=" + tweet.getTwid() + "></td></tr>");
+            out.println("</form>");
             out.println("</div>");
         }
         out.println ( "</body></html>" );
