@@ -48,21 +48,31 @@ public class WoTServlet extends HttpServlet {
 		String author = new String();
 		String tweetText = new String();
 		
-		String wid = request.getParameter("twid");
+		String wid = request.getParameter("twid"); //Id del tweet que se desea eliminar, proporcionado por el form HTML
 		
-		long id = 0;
+		response.setContentType ("text/plain");
+        response.setCharacterEncoding(ENCODING);
+        PrintWriter out = response.getWriter();
 		
+		long id = 0; //id que la base de dades asigna a un tweet
+	
 		if (wid != null) {
 			
-			Cookie[] vector_cookies = request.getCookies();
-			if (vector_cookies != null) {
-				for (Cookie c: vector_cookies) {
-					if (c.getValue().equals(sha256(String.valueOf(wid)))) {
-						tweetDAO.deleteTweet(Integer.valueOf(wid));
+			Cookie[] vectorCookies = request.getCookies();
+			
+			if(vectorCookies != null) 
+			{
+			
+				for(Cookie cookies:vectorCookies)
+				{
+	
+					if(cookies.getValue().equals(sha256(wid))) 
+					{
+						tweetDAO.deleteTweet(Integer.parseInt(wid));
 					}
 				}
+		
 			}
-
 		}
 		else {
 			author = request.getParameter("author");
@@ -70,19 +80,13 @@ public class WoTServlet extends HttpServlet {
 			
 			try {
 				id = tweetDAO.insertTweet(author, tweetText);
+				Cookie c = new Cookie("idTweetClient" + String.valueOf(id), sha256(String.valueOf(id)));
+			    response.addCookie(c);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			
-			Cookie c = new Cookie("idTweetClient", sha256(String.valueOf(id)));
-			response.addCookie(c);
-			
 		}
-		
-		response.setContentType ("text/plain");
-        response.setCharacterEncoding(ENCODING);
-        PrintWriter out = response.getWriter();
-        
+
 		
 		if (request.getHeader("Accept").equals("text/plain")) out.println(id);
         else {
