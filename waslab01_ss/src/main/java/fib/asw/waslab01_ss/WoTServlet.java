@@ -80,7 +80,7 @@ public class WoTServlet extends HttpServlet {
 			
 			try {
 				id = tweetDAO.insertTweet(author, tweetText);
-				Cookie c = new Cookie("idTweetClient" + String.valueOf(id), sha256(String.valueOf(id)));
+				Cookie c = new Cookie("idTweetClient:" + String.valueOf(id), sha256(String.valueOf(id)));
 			    response.addCookie(c);
 			} catch (SQLException e) {
 				e.printStackTrace();
